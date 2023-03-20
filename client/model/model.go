@@ -1,8 +1,6 @@
-package models
+package model
 
-import (
-	"crypto/rsa"
-)
+import "crypto/rsa"
 
 type User struct {
 	UID      string `json:"uid"`

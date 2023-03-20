@@ -33,8 +33,10 @@ Loop:
 	for {
 		switch dataSelect {
 		case "1":
-			fmt.Printf("\nPlease enter a password:\n")
-			fmt.Fscan(reader, &p.Data)
+			fmt.Printf("\nPlease enter login:\n")
+			fmt.Fscan(reader, &p.Login)
+			fmt.Printf("\nPlease enter password:\n")
+			fmt.Fscan(reader, &p.Pass)
 			if err := a.manager.AddPassword(&p); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}

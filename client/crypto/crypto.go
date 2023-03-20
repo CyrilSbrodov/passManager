@@ -257,39 +257,6 @@ func LoadPrivateAndPublicPEMKey(private, public string, logger *loggers.Logger) 
 	return privateKeyImported, publicKeyImported, nil
 }
 
-//func LoadPublicPEMKey(filename string, logger *loggers.Logger) (*rsa.PublicKey, error) {
-//	publicKeyFile, err := os.Open(filename)
-//	//"../../internal/crypto/" +
-//	if err != nil {
-//		logger.LogErr(err, "filed to open file")
-//		return nil, err
-//	}
-//	defer publicKeyFile.Close()
-//
-//	pemFileInfo, err := publicKeyFile.Stat()
-//	if err != nil {
-//		logger.LogErr(err, "filed to read stat from file")
-//	}
-//	size := pemFileInfo.Size()
-//	pemBytes := make([]byte, size)
-//	buffer := bufio.NewReader(publicKeyFile)
-//	_, err = buffer.Read(pemBytes)
-//
-//	if err != nil {
-//		logger.LogErr(err, "filed to read bytes from file")
-//		return nil, err
-//	}
-//
-//	data, _ := pem.Decode(pemBytes)
-//
-//	public, err := x509.ParsePKCS1PublicKey(data.Bytes)
-//	if err != nil {
-//		logger.LogErr(err, "filed to import key")
-//		return nil, err
-//	}
-//	return public, nil
-//}
-
 func (r *RSA) EncryptedCard(d *model.CryptoCard) {
 	var err error
 	d.Number, err = r.EncryptedData(d.Number, r.Public)
@@ -310,7 +277,12 @@ func (r *RSA) EncryptedCard(d *model.CryptoCard) {
 }
 func (r *RSA) EncryptedPassword(d *model.CryptoPassword) {
 	var err error
-	d.Data, err = r.EncryptedData(d.Data, r.Public)
+	d.Login, err = r.EncryptedData(d.Login, r.Public)
+	if err != nil {
+		r.logger.LogErr(err, "")
+		os.Exit(1)
+	}
+	d.Pass, err = r.EncryptedData(d.Pass, r.Public)
 	if err != nil {
 		r.logger.LogErr(err, "")
 		os.Exit(1)
@@ -354,7 +326,12 @@ func (r *RSA) DecryptedCard(d *model.CryptoCard) {
 
 func (r *RSA) DecryptedPassword(d *model.CryptoPassword) {
 	var err error
-	d.Data, err = r.DecryptedData(d.Data, r.Private)
+	d.Login, err = r.DecryptedData(d.Login, r.Private)
+	if err != nil {
+		r.logger.LogErr(err, "")
+		os.Exit(1)
+	}
+	d.Pass, err = r.DecryptedData(d.Pass, r.Private)
 	if err != nil {
 		r.logger.LogErr(err, "")
 		os.Exit(1)

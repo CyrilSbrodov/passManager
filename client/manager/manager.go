@@ -453,7 +453,7 @@ func (m *Manager) GetPasswords() (string, error) {
 	}
 	result := "\nyou have these passwords:\n"
 	for _, pass := range passwords {
-		result += fmt.Sprintf("%v. Password: %v \n", pass.UID, string(pass.Data))
+		result += fmt.Sprintf("%v. Login: %v Password: %v \n", pass.UID, string(pass.Login), string(pass.Pass))
 	}
 	return result, nil
 }

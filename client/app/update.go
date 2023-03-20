@@ -33,10 +33,12 @@ LoopUpdate:
 	for {
 		switch dataSelect {
 		case "1":
-			fmt.Printf("\nPlease enter a password's id:\n")
+			fmt.Printf("\nPlease enter password's id:\n")
 			fmt.Fscan(reader, &p.UID)
-			fmt.Printf("\nPlease enter a password:\n")
-			fmt.Fscan(reader, &p.Data)
+			fmt.Printf("\nPlease enter login:\n")
+			fmt.Fscan(reader, &p.Login)
+			fmt.Printf("\nPlease enter password:\n")
+			fmt.Fscan(reader, &p.Pass)
 			if err := a.manager.UpdatePassword(&p); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}

@@ -45,8 +45,9 @@ type KeyAndToken struct {
 }
 
 type CryptoPassword struct {
-	UID  int    `json:"uid_pass"`
-	Data []byte `json:"data_pass"`
+	UID   int    `json:"uid_pass"`
+	Login []byte `json:"data_pass"`
+	Pass  []byte `json:"pass"`
 }
 
 type CryptoBinaryData struct {

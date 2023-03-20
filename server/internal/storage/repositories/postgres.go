@@ -55,7 +55,8 @@ func createTable(ctx context.Context, client postgres.Client, logger *loggers.Lo
     		user_id BIGINT,
     		id BIGINT PRIMARY KEY generated always as identity,
     		FOREIGN KEY (user_id) REFERENCES users(id),
-    		password bytea                          
+    		login bytea,
+		    password bytea
 		);
 		CREATE TABLE if not exists cards (
     		user_id BIGINT,
@@ -123,8 +124,8 @@ func (s *Store) Login(u *models.User) (string, error) {
 }
 
 func (s *Store) CollectPassword(d *models.CryptoPassword, id string) (int, error) {
-	q := `INSERT INTO passwords (user_id, password) VALUES ($1, $2)`
-	if _, err := s.client.Exec(context.Background(), q, id, d.Data); err != nil {
+	q := `INSERT INTO passwords (user_id, login, password) VALUES ($1, $2, $3)`
+	if _, err := s.client.Exec(context.Background(), q, id, d.Login, d.Pass); err != nil {
 		s.logger.LogErr(err, "Failure to insert object into table")
 		return 500, err
 	}
@@ -164,40 +165,6 @@ func (s *Store) CollectBinary(d *models.CryptoBinaryData, id string) (int, error
 	return 200, nil
 }
 
-func (s *Store) GetAllData(id string) (int, models.CryptoData, error) {
-	var d models.CryptoData
-
-	q := `SELECT passwords.passwords, cards.number, cards.card_holder, cards.cvc, text_table.text, binary_table.binary_data 
-	FROM cards JOIN passwords, text_table, binary_table WHERE user_data.user_id = $1`
-	rows, err := s.client.Query(context.Background(), q, id)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			s.logger.LogErr(err, "Failure to select object from table")
-			return 204, d, fmt.Errorf("no one withdraw")
-		}
-		s.logger.LogErr(err, "")
-		return 500, d, err
-	}
-	//добавление всех данных в слайс
-	for rows.Next() {
-		var c models.CryptoCard
-		var b models.CryptoBinaryData
-		var p models.CryptoPassword
-		var t models.CryptoTextData
-		err = rows.Scan(&p.Data, &c.Number, &c.Name, &c.CVC, &t.Text, &b.Data)
-		if err != nil && err != pgx.ErrNoRows {
-			s.logger.LogErr(err, "Failure to scan object from table")
-			return 500, d, err
-		}
-		d.Card = append(d.Card, c)
-		d.BinaryData = append(d.BinaryData, b)
-		d.TextData = append(d.TextData, t)
-		d.Password = append(d.Password, p)
-	}
-
-	return 200, d, nil
-}
-
 func (s *Store) GetCards(id string) (int, []models.CryptoCard, error) {
 	var data []models.CryptoCard
 
@@ -229,7 +196,7 @@ func (s *Store) GetCards(id string) (int, []models.CryptoCard, error) {
 func (s *Store) GetPassword(id string) (int, []models.CryptoPassword, error) {
 	var data []models.CryptoPassword
 
-	q := `SELECT id, password FROM passwords WHERE user_id = $1`
+	q := `SELECT id, login, password FROM passwords WHERE user_id = $1`
 	rows, err := s.client.Query(context.Background(), q, id)
 	if err != nil {
 		fmt.Println(err)
@@ -244,7 +211,7 @@ func (s *Store) GetPassword(id string) (int, []models.CryptoPassword, error) {
 	for rows.Next() {
 		var p models.CryptoPassword
 
-		err = rows.Scan(&p.UID, &p.Data)
+		err = rows.Scan(&p.UID, &p.Login, &p.Pass)
 		if err != nil && err != pgx.ErrNoRows {
 			s.logger.LogErr(err, "Failure to scan object from table")
 			return 500, data, err
@@ -365,8 +332,8 @@ func (s *Store) UpdateCard(data *models.CryptoCard, id string) (int, error) {
 }
 
 func (s *Store) UpdatePassword(data *models.CryptoPassword, id string) (int, error) {
-	q := `UPDATE passwords SET password = $1 WHERE id = $2 AND user_id = $3`
-	if _, err := s.client.Exec(context.Background(), q, data.Data, data.UID, id); err != nil {
+	q := `UPDATE passwords SET login = $1, password = $2 WHERE id = $3 AND user_id = $4`
+	if _, err := s.client.Exec(context.Background(), q, data.Login, data.Pass, data.UID, id); err != nil {
 		fmt.Println(err)
 		s.logger.LogErr(err, "Failure to insert object into table")
 		return 500, err

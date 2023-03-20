@@ -9,7 +9,6 @@ type Storage interface {
 	CollectPassword(d *models.CryptoPassword, login string) (int, error)
 	CollectText(d *models.CryptoTextData, login string) (int, error)
 	CollectBinary(d *models.CryptoBinaryData, login string) (int, error)
-	GetAllData(id string) (int, models.CryptoData, error)
 	GetCards(id string) (int, []models.CryptoCard, error)
 	GetPassword(id string) (int, []models.CryptoPassword, error)
 	GetText(id string) (int, []models.CryptoTextData, error)

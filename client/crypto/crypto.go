@@ -1,3 +1,6 @@
+// Пакет crypto предоставляет возможность шифрования данных и обратной расшифровке на стороне клиента.
+// Сервер получает все данные в зашифрованном виде, кроме логина, пароля и уид.
+
 package crypto
 
 import (
@@ -20,29 +23,33 @@ import (
 	"github.com/CyrilSbrodov/passManager.git/client/model"
 )
 
+// Crypto - интерфейс шифрования
 type Crypto interface {
-	DecryptedData(b []byte, privateKey *rsa.PrivateKey) ([]byte, error)
-	EncryptedData(b []byte, publicKey *rsa.PublicKey) ([]byte, error)
-	EncryptedCard(d *model.CryptoCard)
-	EncryptedPassword(d *model.CryptoPassword)
-	EncryptedTextData(d *model.CryptoTextData)
-	EncryptedBinaryData(d *model.CryptoBinaryData)
-	DecryptedCard(d *model.CryptoCard)
-	DecryptedPassword(d *model.CryptoPassword)
-	DecryptedTextData(d *model.CryptoTextData)
-	DecryptedBinaryData(d *model.CryptoBinaryData)
+	DecryptedData(b []byte, privateKey *rsa.PrivateKey) ([]byte, error) // Расшифровка.
+	EncryptedData(b []byte, publicKey *rsa.PublicKey) ([]byte, error)   // Шифрование.
+	EncryptedCard(d *model.CryptoCard)                                  // Шифрование структуры CryptoCard.
+	EncryptedPassword(d *model.CryptoPassword)                          // Шифрование структуры CryptoPassword.
+	EncryptedTextData(d *model.CryptoTextData)                          // Шифрование структуры CryptoTextData.
+	EncryptedBinaryData(d *model.CryptoBinaryData)                      // Шифрование структуры CryptoBinaryData.
+	DecryptedCard(d *model.CryptoCard)                                  // Расшифровка структуры CryptoCard.
+	DecryptedPassword(d *model.CryptoPassword)                          // Расшифровка структуры CryptoPassword.
+	DecryptedTextData(d *model.CryptoTextData)                          // Расшифровка структуры CryptoTextData.
+	DecryptedBinaryData(d *model.CryptoBinaryData)                      // Расшифровка структуры CryptoBinaryData.
 }
 
+// RSA структура шифрования.
 type RSA struct {
 	logger  *loggers.Logger
 	Private *rsa.PrivateKey
 	Public  *rsa.PublicKey
 }
 
+// NewRSA - функция создания крипто.
 func NewRSA(cfg config.Config, logger *loggers.Logger) *RSA {
 	var private *rsa.PrivateKey
 	var public *rsa.PublicKey
 	var err error
+	//если нет ранее сохраненных ключей, то программа создаст новые.
 	private, public, err = LoadPrivateAndPublicPEMKey(cfg.CryptoPROKey, "public.pem", logger)
 
 	if err != nil {
@@ -60,6 +67,7 @@ func NewRSA(cfg config.Config, logger *loggers.Logger) *RSA {
 	}
 }
 
+// addCryptoKey - создание новых ключей шифрования.
 func addCryptoKey(filenamePublicKey, filenamePrivateKey, path string, logger *loggers.Logger) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	// создаём шаблон сертификата
 	cert := &x509.Certificate{

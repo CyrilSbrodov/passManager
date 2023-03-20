@@ -1,3 +1,5 @@
+// Package app пакет для вызова бесконечного цикла с выбором возможных действий с сервером.
+// Данный пакет предоставляет возможность удаления данных на сервере.
 package app
 
 import (
@@ -7,6 +9,7 @@ import (
 	"strings"
 )
 
+// deleteData - функция удаления данных.
 func (a *App) deleteData(reader *bufio.Reader) {
 	fmt.Printf("\n\nSelect what do you want to delete?\n\n")
 	var id int

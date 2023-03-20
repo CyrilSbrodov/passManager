@@ -1,3 +1,4 @@
+// Package config пакет конфига сервера.
 package config
 
 import "flag"

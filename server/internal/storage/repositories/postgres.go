@@ -1,3 +1,4 @@
+// Package repositories позволяет сохранять и обрабатывать данные в базе данных. Так же отдавать их клиенту по запросу.
 package repositories
 
 import (
@@ -18,12 +19,14 @@ import (
 	"github.com/CyrilSbrodov/passManager.git/server/pkg/client/postgres"
 )
 
+// Store - структура репозитория.
 type Store struct {
 	client postgres.Client
 	Hash   string
 	logger loggers.Logger
 }
 
+// createTable - функция создания новых таблиц в БД.
 func createTable(ctx context.Context, client postgres.Client, logger *loggers.Logger) error {
 	tx, err := client.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -76,6 +79,7 @@ func createTable(ctx context.Context, client postgres.Client, logger *loggers.Lo
 	return tx.Commit(ctx)
 }
 
+// NewStore - функция создания нового репозитория.
 func NewStore(client postgres.Client, cfg *config.Config, logger *loggers.Logger) (*Store, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

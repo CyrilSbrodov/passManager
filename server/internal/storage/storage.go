@@ -2,6 +2,7 @@ package storage
 
 import "github.com/CyrilSbrodov/passManager.git/server/internal/models"
 
+// Storage - интерфейс репозитория.
 type Storage interface {
 	Register(u *models.User) (string, error)
 	Login(u *models.User) (string, error)

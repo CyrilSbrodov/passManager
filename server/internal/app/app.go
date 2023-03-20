@@ -1,3 +1,4 @@
+// Package app пакет позволяет собрать сервер и запустить его.
 package app
 
 import (
@@ -19,6 +20,7 @@ import (
 	"github.com/CyrilSbrodov/passManager.git/server/pkg/client/postgres"
 )
 
+// ServerApp - структура сервера.
 type ServerApp struct {
 	router *chi.Mux
 	cfg    *config.Config
@@ -26,6 +28,7 @@ type ServerApp struct {
 	crypto crypto.RSA
 }
 
+// NewServerApp - функция создания нового сервера.
 func NewServerApp() *ServerApp {
 	cfg := config.ConfigInit()
 	logger := loggers.NewLogger()
@@ -40,6 +43,7 @@ func NewServerApp() *ServerApp {
 	}
 }
 
+// Run - функция запуска сервера.
 func (a *ServerApp) Run() {
 	client, err := postgres.NewClient(context.Background(), 5, a.cfg, a.logger)
 	if err != nil {

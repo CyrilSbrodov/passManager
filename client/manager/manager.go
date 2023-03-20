@@ -1,3 +1,4 @@
+// Package manager Модуль отправляет и получает все JSON запросы с сервера. Обрабатывает и отправляет в app.
 package manager
 
 import (
@@ -14,6 +15,7 @@ import (
 	"github.com/CyrilSbrodov/passManager.git/client/model"
 )
 
+// Manager -структура обработчика.
 type Manager struct {
 	client              http.Client
 	config              *config.Config
@@ -26,6 +28,7 @@ type Manager struct {
 	jwt                 string
 }
 
+// Managers - интерфейс обработчика.
 type Managers interface {
 	Register(login, password string) error
 	Auth(login, password string) error
@@ -47,6 +50,7 @@ type Managers interface {
 	UpdateBinary(d *model.CryptoBinaryData) error
 }
 
+// NewManager - функция создания нового обработчика.
 func NewManager(logger *loggers.Logger, cfg *config.Config, client http.Client) *Manager {
 	c := crypto.NewRSA(*cfg, logger)
 	return &Manager{
@@ -62,6 +66,7 @@ func NewManager(logger *loggers.Logger, cfg *config.Config, client http.Client) 
 	}
 }
 
+// Register - регистрация нового пользователя.
 func (m *Manager) Register(login, password string) error {
 	var u model.User
 	u.Login = login
@@ -120,6 +125,7 @@ func (m *Manager) Register(login, password string) error {
 	return nil
 }
 
+// Auth - Аутентификация пользователя.
 func (m *Manager) Auth(login, password string) error {
 	var u model.User
 	u.Login = login
@@ -174,6 +180,7 @@ func (m *Manager) Auth(login, password string) error {
 	return nil
 }
 
+// AddCard - добавление новых карт на сервер.
 func (m *Manager) AddCard(data *model.CryptoCard) error {
 	m.crypto.EncryptedCard(data)
 	uByte, err := json.Marshal(data)
@@ -215,6 +222,7 @@ func (m *Manager) AddCard(data *model.CryptoCard) error {
 	return nil
 }
 
+// AddPassword - добавление новых пар логин/пароль на сервер.
 func (m *Manager) AddPassword(data *model.CryptoPassword) error {
 	m.crypto.EncryptedPassword(data)
 	uByte, err := json.Marshal(data)
@@ -257,6 +265,7 @@ func (m *Manager) AddPassword(data *model.CryptoPassword) error {
 	return nil
 }
 
+// AddText - добавление новых текстовых данных на сервер.
 func (m *Manager) AddText(data *model.CryptoTextData) error {
 	m.crypto.EncryptedTextData(data)
 	uByte, err := json.Marshal(data)
@@ -299,6 +308,7 @@ func (m *Manager) AddText(data *model.CryptoTextData) error {
 	return nil
 }
 
+// AddBinary - добавление новых бинарных данных на сервер.
 func (m *Manager) AddBinary(data *model.CryptoBinaryData) error {
 	m.crypto.EncryptedBinaryData(data)
 	uByte, err := json.Marshal(data)
@@ -341,6 +351,7 @@ func (m *Manager) AddBinary(data *model.CryptoBinaryData) error {
 	return nil
 }
 
+// GetCards - получение всех карт с сервера, что загрузил пользователь.
 func (m *Manager) GetCards() (string, error) {
 	req, err := http.NewRequest(http.MethodGet, m.url+m.config.Addr+"/api/data/cards", nil)
 
@@ -393,12 +404,12 @@ func (m *Manager) GetCards() (string, error) {
 	}
 	result := "\nyou have these cards:\n"
 	for _, card := range cards {
-		result += fmt.Sprintf("%v. Number: %v, Name: %s, CVC: %v \n", card.UID, string(card.Number),
-			string(card.Name), string(card.CVC))
+		result += fmt.Sprintf("%v. Number: %s Name: %s CVC: %s\n", card.UID, string(card.Number), string(card.Name), string(card.CVC))
 	}
 	return result, nil
 }
 
+// GetPasswords - получение всех пар логин/пароль с сервера, что загрузил пользователь.
 func (m *Manager) GetPasswords() (string, error) {
 	req, err := http.NewRequest(http.MethodGet, m.url+m.config.Addr+"/api/data/password", nil)
 
@@ -458,6 +469,7 @@ func (m *Manager) GetPasswords() (string, error) {
 	return result, nil
 }
 
+// GetText - получение всех текстовых данных с сервера, что загрузил пользователь.
 func (m *Manager) GetText() (string, error) {
 	req, err := http.NewRequest(http.MethodGet, m.url+m.config.Addr+"/api/data/text", nil)
 
@@ -517,6 +529,7 @@ func (m *Manager) GetText() (string, error) {
 	return result, nil
 }
 
+// GetBinary - получение всех бинарных данных с сервера, что загрузил пользователь.
 func (m *Manager) GetBinary() (string, error) {
 	req, err := http.NewRequest(http.MethodGet, m.url+m.config.Addr+"/api/data/binary", nil)
 
@@ -576,6 +589,7 @@ func (m *Manager) GetBinary() (string, error) {
 	return result, nil
 }
 
+// DeleteCard - удаление выбранной карты с сервера.
 func (m *Manager) DeleteCard(id int) error {
 	var data model.CryptoCard
 	data.UID = id
@@ -619,6 +633,7 @@ func (m *Manager) DeleteCard(id int) error {
 	return nil
 }
 
+// DeleteText - удаление выбранных текстовых данных с сервера.
 func (m *Manager) DeleteText(id int) error {
 	var data model.CryptoTextData
 	data.UID = id
@@ -663,6 +678,7 @@ func (m *Manager) DeleteText(id int) error {
 	return nil
 }
 
+// DeletePassword - удаление выбранной пары логин/пароль с сервера.
 func (m *Manager) DeletePassword(id int) error {
 	var data model.CryptoPassword
 	data.UID = id
@@ -707,6 +723,7 @@ func (m *Manager) DeletePassword(id int) error {
 	return nil
 }
 
+// DeleteBinary - удаление выбранных бинарных данных с сервера.
 func (m *Manager) DeleteBinary(id int) error {
 	var data model.CryptoBinaryData
 	data.UID = id
@@ -751,6 +768,7 @@ func (m *Manager) DeleteBinary(id int) error {
 	return nil
 }
 
+// UpdateCard - изменение выбранной карты на сервере.
 func (m *Manager) UpdateCard(data *model.CryptoCard) error {
 	m.crypto.EncryptedCard(data)
 	uByte, err := json.Marshal(data)
@@ -792,6 +810,8 @@ func (m *Manager) UpdateCard(data *model.CryptoCard) error {
 	defer resp.Body.Close()
 	return nil
 }
+
+// UpdatePassword - изменение выбранных пар логин/пароль данных на сервере.
 func (m *Manager) UpdatePassword(data *model.CryptoPassword) error {
 	m.crypto.EncryptedPassword(data)
 	uByte, err := json.Marshal(data)
@@ -834,6 +854,7 @@ func (m *Manager) UpdatePassword(data *model.CryptoPassword) error {
 	return nil
 }
 
+// UpdateText - изменение выбранных текстовых данных на сервере.
 func (m *Manager) UpdateText(data *model.CryptoTextData) error {
 	m.crypto.EncryptedTextData(data)
 	uByte, err := json.Marshal(data)
@@ -876,6 +897,7 @@ func (m *Manager) UpdateText(data *model.CryptoTextData) error {
 	return nil
 }
 
+// UpdateBinary - изменение выбранных бинарных данных на сервере.
 func (m *Manager) UpdateBinary(data *model.CryptoBinaryData) error {
 	m.crypto.EncryptedBinaryData(data)
 	uByte, err := json.Marshal(data)

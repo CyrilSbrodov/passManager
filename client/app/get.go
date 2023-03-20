@@ -1,3 +1,5 @@
+// Package app пакет для вызова бесконечного цикла с выбором возможных действий с сервером.
+// Данный пакет предоставляет возможность получения сохраненных данных из сервера.
 package app
 
 import (
@@ -38,7 +40,7 @@ LoopSecond:
 			if err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}
-			fmt.Printf(d + "\n")
+			fmt.Printf(d)
 			break LoopSecond
 		case "3":
 			d, err := a.manager.GetText()

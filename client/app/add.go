@@ -1,14 +1,16 @@
+// Package app пакет для вызова бесконечного цикла с выбором возможных действий с сервером.
+// Данный пакет предоставляет возможность добавлять данные на сервер.
 package app
 
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/CyrilSbrodov/passManager.git/client/model"
 )
 
+// addData функция добавления данных.
 func (a *App) addData(reader *bufio.Reader) {
 	fmt.Printf("\n\nSelect what do you want to save?\n\n")
 
@@ -16,6 +18,7 @@ func (a *App) addData(reader *bufio.Reader) {
 	var p model.CryptoPassword
 	var t model.CryptoTextData
 	var b model.CryptoBinaryData
+
 	data :=
 		`1. Password.
 2. Card.
@@ -26,49 +29,64 @@ func (a *App) addData(reader *bufio.Reader) {
 	fmt.Printf(data + "\n")
 	dataSelect, err := reader.ReadString('\n')
 	if err != nil {
-		log.Fatalf("Error in reading input: %v", err)
+		a.logger.LogErr(err, "Error in reading input")
 	}
 	dataSelect = strings.TrimSpace(dataSelect)
-Loop:
+
+loop:
 	for {
 		switch dataSelect {
 		case "1":
 			fmt.Printf("\nPlease enter login:\n")
-			fmt.Fscan(reader, &p.Login)
+			p.Login, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			fmt.Printf("\nPlease enter password:\n")
-			fmt.Fscan(reader, &p.Pass)
+			p.Pass, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			if err := a.manager.AddPassword(&p); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}
-			break Loop
+			break loop
 		case "2":
 			fmt.Printf("\nPlease enter card information:\n")
 			fmt.Printf("\nCard number:\n")
-			fmt.Fscan(reader, &c.Number)
+			c.Number, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			fmt.Printf("\nCard holder:\n")
-			fmt.Fscan(reader, &c.Name)
+			c.Name, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			fmt.Printf("\nCVC number:\n")
-			fmt.Fscan(reader, &c.CVC)
+			c.CVC, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			if err := a.manager.AddCard(&c); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}
-			break Loop
+			break loop
 		case "3":
 			fmt.Printf("\nPlease enter a text:\n")
-			fmt.Fscan(reader, &t.Text)
+			t.Text, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			if err := a.manager.AddText(&t); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}
-			break Loop
+			break loop
 		case "4":
 			fmt.Printf("\nPlease enter a binary:\n")
-			fmt.Fscan(reader, &b.Data)
+			b.Data, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			if err := a.manager.AddBinary(&b); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}
-			break Loop
+			break loop
 		case "5":
-			break Loop
+			break loop
 		}
+	}
+}
+
+//checkError проверка на ошибку.
+func (a *App) checkError(err error) {
+	if err != nil {
+		a.logger.LogErr(err, "Error in reading input")
 	}
 }

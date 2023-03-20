@@ -1,3 +1,5 @@
+// Package handlers позволяет получать данные от клиентов, обрабатывать и отправлять в репозиторий для дальнейшей обработки.
+// Данный модуль создает обработчика и позволяет проводить авторизацию и регистрацию пользователей.
 package handlers
 
 import (
@@ -18,10 +20,12 @@ import (
 	"github.com/CyrilSbrodov/passManager.git/server/pkg/auth"
 )
 
+// Handlers - интерфейс обработчика.
 type Handlers interface {
 	Register(router *chi.Mux)
 }
 
+// Handler - структура обработчика.
 type Handler struct {
 	storage.Storage
 	crypto crypto.RSA
@@ -29,6 +33,7 @@ type Handler struct {
 	token  *jwtauth.JWTAuth
 }
 
+// NewHandler - функция создания нового обработчика.
 func NewHandler(storage storage.Storage, logger *loggers.Logger, c crypto.RSA, token *jwtauth.JWTAuth) Handlers {
 	return &Handler{
 		Storage: storage,
@@ -38,6 +43,7 @@ func NewHandler(storage storage.Storage, logger *loggers.Logger, c crypto.RSA, t
 	}
 }
 
+// Register - функция регистрация различных эндпоинтов.
 func (h *Handler) Register(r *chi.Mux) {
 	compressor := middleware.NewCompressor(gzip.DefaultCompression)
 	r.Use(compressor.Handler)
@@ -69,6 +75,7 @@ func (h *Handler) Register(r *chi.Mux) {
 	})
 }
 
+// Registration - эндпоинт регистрации.
 func (h *Handler) Registration() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		var u models.User
@@ -120,6 +127,7 @@ func (h *Handler) Registration() http.HandlerFunc {
 	}
 }
 
+// Login - эндпоинт аутентификации.
 func (h *Handler) Login() http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		var u models.User

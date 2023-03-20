@@ -1,3 +1,4 @@
+// Package config - это пакет с конфигом, который позволяет гибко запускать приложение.
 package config
 
 import "flag"

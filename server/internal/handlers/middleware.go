@@ -13,6 +13,8 @@ const (
 	authorizationHeader = "Authorization"
 )
 
+// userIdentity - перехватчик, который проверяет токены авторизации. Если есть токен, то пропускает дальше.
+// Если нет токена, то отправлет статус http.StatusUnauthorized.
 func (h *Handler) userIdentity(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		ctx := context.Background()

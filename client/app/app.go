@@ -1,3 +1,4 @@
+// Package app пакет для вызова бесконечного цикла с выбором возможных действий с сервером.
 package app
 
 import (
@@ -37,6 +38,7 @@ func NewApp() *App {
 	}
 }
 
+// Run - функция запуска клиента.
 func (a *App) Run() {
 	for {
 		fmt.Printf("\n\nWhat do you want to do?\n\n")

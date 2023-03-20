@@ -1,3 +1,6 @@
+// Package app пакет для вызова бесконечного цикла с выбором возможных действий с сервером.
+// Данный пакет предоставляет возможность изменения данных на сервере.
+// Основной параметр для изменения данных это UID внутри каждой структуры из пакета model.
 package app
 
 import (
@@ -36,9 +39,11 @@ LoopUpdate:
 			fmt.Printf("\nPlease enter password's id:\n")
 			fmt.Fscan(reader, &p.UID)
 			fmt.Printf("\nPlease enter login:\n")
-			fmt.Fscan(reader, &p.Login)
+			p.Login, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			fmt.Printf("\nPlease enter password:\n")
-			fmt.Fscan(reader, &p.Pass)
+			p.Pass, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			if err := a.manager.UpdatePassword(&p); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}
@@ -48,11 +53,14 @@ LoopUpdate:
 			fmt.Printf("\nCard's id:\n")
 			fmt.Fscan(reader, &c.UID)
 			fmt.Printf("\nCard number:\n")
-			fmt.Fscan(reader, &c.Number)
+			c.Number, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			fmt.Printf("\nCard holder:\n")
-			fmt.Fscan(reader, &c.Name)
+			c.Name, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			fmt.Printf("\nCVC number:\n")
-			fmt.Fscan(reader, &c.CVC)
+			c.CVC, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			if err := a.manager.UpdateCard(&c); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}
@@ -61,7 +69,8 @@ LoopUpdate:
 			fmt.Printf("\nPlease enter a text's id:\n")
 			fmt.Fscan(reader, &t.UID)
 			fmt.Printf("\nPlease enter a text:\n")
-			fmt.Fscan(reader, &t.Text)
+			t.Text, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			if err := a.manager.UpdateText(&t); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}
@@ -70,7 +79,8 @@ LoopUpdate:
 			fmt.Printf("\nPlease enter a bibary's id:\n")
 			fmt.Fscan(reader, &b.UID)
 			fmt.Printf("\nPlease enter a binary:\n")
-			fmt.Fscan(reader, &b.Data)
+			b.Data, err = reader.ReadBytes('\n')
+			a.checkError(err)
 			if err := a.manager.UpdateBinary(&b); err != nil {
 				fmt.Printf("\nsomething wrong, try again")
 			}

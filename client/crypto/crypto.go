@@ -12,7 +12,6 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	"fmt"
 	"math/big"
 	"net"
 	"os"
@@ -50,10 +49,9 @@ func NewRSA(cfg config.Config, logger *loggers.Logger) *RSA {
 	var public *rsa.PublicKey
 	var err error
 	//если нет ранее сохраненных ключей, то программа создаст новые.
-	private, public, err = LoadPrivateAndPublicPEMKey(cfg.CryptoPROKey, "public.pem", logger)
+	private, public, err = LoadPrivateAndPublicPEMKey(cfg.CryptoPROKey, "public.pem", cfg.CryptoPROKeyPath, logger)
 
 	if err != nil {
-		fmt.Println("new")
 		private, public, err = addCryptoKey("public.pem", cfg.CryptoPROKey, cfg.CryptoPROKeyPath, logger)
 		if err != nil {
 			logger.LogErr(err, "")
@@ -203,8 +201,8 @@ func (r *RSA) EncryptedData(b []byte, publicKey *rsa.PublicKey) ([]byte, error) 
 	return encryptedBytes, nil
 }
 
-func LoadPrivateAndPublicPEMKey(private, public string, logger *loggers.Logger) (*rsa.PrivateKey, *rsa.PublicKey, error) {
-	privateKeyFile, err := os.Open(private)
+func LoadPrivateAndPublicPEMKey(private, public, path string, logger *loggers.Logger) (*rsa.PrivateKey, *rsa.PublicKey, error) {
+	privateKeyFile, err := os.Open(path + private)
 	if err != nil {
 		logger.LogErr(err, "filed to open file")
 		return nil, nil, err
@@ -233,7 +231,7 @@ func LoadPrivateAndPublicPEMKey(private, public string, logger *loggers.Logger) 
 		return nil, nil, err
 	}
 
-	publicKeyFile, err := os.Open(public)
+	publicKeyFile, err := os.Open(path + public)
 	if err != nil {
 		logger.LogErr(err, "filed to open file")
 		return nil, nil, err

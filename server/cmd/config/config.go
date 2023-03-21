@@ -19,6 +19,6 @@ func ConfigInit() *Config {
 	flag.StringVar(&cfg.DatabaseDSN, "d", "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable", "DATABASE_DSN")
 	flag.StringVar(&cfg.SessionKey, "k", "secret", "session key")
 	flag.StringVar(&cfg.CryptoPROKey, "crypto-key", "private.pem", "path to file")
-	flag.StringVar(&cfg.CryptoPROKeyPath, "crypto-key-path", "", "path to folder")
+	flag.StringVar(&cfg.CryptoPROKeyPath, "crypto-key-path", "./server/internal/crypto/", "path to folder")
 	return cfg
 }

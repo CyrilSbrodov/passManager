@@ -15,6 +15,6 @@ func ConfigInit() *Config {
 	cfg := &Config{}
 	flag.StringVar(&cfg.Addr, "a", "localhost:8080", "server address")
 	flag.StringVar(&cfg.CryptoPROKey, "crypto-key", "private.pem", "path to file")
-	flag.StringVar(&cfg.CryptoPROKeyPath, "crypto-key-path", "", "path to folder")
+	flag.StringVar(&cfg.CryptoPROKeyPath, "crypto-key-path", "./client/crypto/", "path to folder")
 	return cfg
 }
